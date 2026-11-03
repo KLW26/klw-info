@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}html{color-scheme:light dark}body{margin:0}</style>
+<title>Centrum Komunikatów KLW</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:ital,wght@0,600;1,700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: editor stack on the left, sticky Discord-style webhook preview on the right; tabs below 920px */
+:root{
+  --bg:#f3f1f1; --surface:#ffffff; --surface-2:#f6f4f4; --line:#ddd8d9;
+  --fg:#17181b; --muted:#67636b; --accent:#d4121f; --accent-fg:#ffffff;
+  --ok:#1f8a4c; --warn:#b36b00; --bad:#c4202b; --focus:#1a5fd6;
+  --font-ui:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --font-dc:'Noto Sans','gg sans','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e0f12; --surface:#16181d; --surface-2:#1d2026; --line:#2b2e36;
+    --fg:#ecebee; --muted:#9d99a6; --accent:#ff3d48; --accent-fg:#16090a;
+    --ok:#3ac47a; --warn:#e8a43a; --bad:#ff6b73; --focus:#6ea2ff; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e0f12; --surface:#16181d; --surface-2:#1d2026; --line:#2b2e36;
+  --fg:#ecebee; --muted:#9d99a6; --accent:#ff3d48; --accent-fg:#16090a;
+  --ok:#3ac47a; --warn:#e8a43a; --bad:#ff6b73; --focus:#6ea2ff; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-ui); font-size:15px; line-height:1.45;
+  padding-block:18px 40px; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1280px;margin:0 auto}
+
+.top{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.top svg{width:46px;height:46px;flex:none}
+.top h1{margin:0;font-family:var(--font-display);font-style:italic;font-weight:700;font-size:30px;line-height:1;letter-spacing:.02em;text-transform:uppercase}
+.top p{margin:3px 0 0;color:var(--muted);font-size:14px}
+.top .grow{flex:1;min-width:0}
+.pill{font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);background:var(--surface);padding:6px 11px;border-radius:5px;white-space:nowrap}
+.pill b{color:var(--accent);font-weight:600}
+
+.tabs{display:none}
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:20px;align-items:start}
+.pane{display:flex;flex-direction:column;gap:14px;min-width:0}
+.pane-preview{position:sticky;top:14px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px 16px;min-width:0}
+.card h2{margin:0 0 12px;font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.hint{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld>span,.lab{font-size:13px;font-weight:500;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.fld>span em{font-style:normal;font-variant-numeric:tabular-nums}
+.over{color:var(--bad)!important;font-weight:600}
+.okc{color:var(--ok)!important;font-weight:600}
+input[aria-invalid="true"]{border-color:var(--bad)}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=url],select,textarea{
+  width:100%;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:15px
+}
+textarea{resize:vertical;min-height:170px;line-height:1.5;font-family:var(--font-ui)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.inline{display:flex;gap:8px;align-items:flex-end}
+.inline>.fld{flex:1}
+
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:8px 13px;font-weight:500;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:5px;padding:6px 11px;font-size:14px;cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw button{width:30px;height:30px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--fg)}
+
+.sec{border:1px solid var(--line);border-radius:8px;padding:12px 14px 14px;background:var(--surface-2);min-width:0}
+.sec input[type=text],.sec textarea{background:var(--surface)}
+.sec textarea{min-height:140px}
+.sechead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sechead b{font-family:var(--font-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:15px}
+.emo{display:flex;flex-wrap:wrap;gap:5px}
+.emo .chip{padding:3px 7px;font-size:16px;line-height:1.3}
+.prow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1.2fr) minmax(0,.9fr) auto;gap:8px;align-items:center;margin-bottom:8px}
+.frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto auto;gap:8px;align-items:center;margin-bottom:8px}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}
+.chk input{width:16px;height:16px;accent-color:var(--accent)}
+
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.hist li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line)}
+.hist li:first-child{border-top:0}
+.hist .t{min-width:0}
+.hist .t b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist .t small{color:var(--muted)}
+.empty{color:var(--muted);font-size:14px;margin:0}
+
+.pvbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--surface-2);padding:6px 12px;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.meter{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+details.json summary{cursor:pointer;font-size:14px;font-weight:500;color:var(--muted)}
+details.json textarea{margin-top:8px;min-height:200px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;white-space:pre}
+
+/* Discord-style message. Own palette per Discord theme, independent of page theme */
+.dc{--dc-bg:#313338;--dc-embed:#2b2d31;--dc-text:#dbdee1;--dc-head:#f2f3f5;--dc-muted:#949ba4;--dc-link:#00a8fc;
+  --dc-pill:rgba(88,101,242,.3);--dc-pillfg:#c9cdfb;--dc-code:#1e1f22;--dc-edge:#3f4147;--dc-quote:#4e5058;
+  background:var(--dc-bg);color:var(--dc-text);font-family:var(--font-dc);border-radius:8px;padding:18px 16px 20px;border:1px solid var(--line);min-width:0;overflow:hidden}
+.dc[data-dc="light"]{--dc-bg:#ffffff;--dc-embed:#f2f3f5;--dc-text:#313338;--dc-head:#060607;--dc-muted:#5c5e66;--dc-link:#0068e0;
+  --dc-pill:rgba(88,101,242,.15);--dc-pillfg:#3c45a5;--dc-code:#e3e5e8;--dc-edge:#d4d7dc;--dc-quote:#c4c9ce}
+.msg{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:16px}
+.msg .av svg{width:40px;height:40px;display:block;border-radius:50%}
+.mh{display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.3}
+.mn{font-weight:500;font-size:16px;color:var(--dc-head)}
+.app{background:#5865f2;color:#fff;font-size:10px;font-weight:600;line-height:15px;padding:0 4px;border-radius:3px;letter-spacing:.02em}
+.mh time{font-size:12px;color:var(--dc-muted);margin-left:2px}
+.mc{font-size:16px;line-height:1.375;margin-top:2px;overflow-wrap:anywhere}
+.mention{background:var(--dc-pill);color:var(--dc-pillfg);border-radius:3px;padding:0 2px;font-weight:500;display:inline-block;line-height:1.3}
+.embed{margin-top:8px;max-width:520px;background:var(--dc-embed);border-left:4px solid #e10600;border-radius:4px;padding:8px 16px 16px 12px;border-top:1px solid var(--dc-edge);border-right:1px solid var(--dc-edge);border-bottom:1px solid var(--dc-edge)}
+.embed+.embed{margin-top:4px}
+.ea{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;font-weight:600;color:var(--dc-head)}
+.ea svg,.eft svg{width:24px;height:24px;border-radius:50%;flex:none}
+.eft svg{width:20px;height:20px}
+.et{margin-top:8px;font-size:16px;font-weight:600;color:var(--dc-head);overflow-wrap:anywhere}
+.ed{margin-top:8px;font-size:14px;line-height:1.375;overflow-wrap:anywhere}
+.ed h1,.ed h2,.ed h3,.fv h1,.fv h2,.fv h3{color:var(--dc-head);margin:.6em 0 .2em;font-weight:700;line-height:1.25}
+.ed h1{font-size:1.5em}.ed h2{font-size:1.25em}.ed h3{font-size:1.1em}
+.ed ul,.ed ol,.fv ul,.fv ol{margin:.25em 0;padding-left:1.4em}
+.ed blockquote,.fv blockquote{margin:.25em 0;padding:0 8px 0 12px;border-left:4px solid var(--dc-quote)}
+.ed a,.fv a,.mc a{color:var(--dc-link);text-decoration:none}
+.ed a:hover{text-decoration:underline}
+.ed code,.fv code,.mc code{background:var(--dc-code);border-radius:3px;padding:.1em .3em;font-family:Consolas,ui-monospace,monospace;font-size:85%}
+.ed pre{background:var(--dc-code);border:1px solid var(--dc-edge);border-radius:4px;padding:7px 9px;margin:.3em 0;overflow-x:auto}
+.ed pre code{background:none;padding:0}
+.mc ul,.mc ol{margin:.15em 0;padding-left:1.6em}
+.mc blockquote{margin:.2em 0;padding:0 8px 0 12px;border-left:4px solid var(--dc-quote)}
+.mc h1,.mc h2,.mc h3{color:var(--dc-head);margin:.5em 0 .15em;font-weight:700;line-height:1.25}
+.mc h1{font-size:1.5em}.mc h2{font-size:1.25em}.mc h3{font-size:1.1em}
+.mc pre{background:var(--dc-code);border:1px solid var(--dc-edge);border-radius:4px;padding:7px 9px;margin:.3em 0;overflow-x:auto;font-size:14px}
+.mc pre code{background:none;padding:0}
+.sp{height:1.375em}
+.ef{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.ef .full{grid-column:1/-1}
+.fn{font-size:14px;font-weight:600;color:var(--dc-head);overflow-wrap:anywhere}
+.fv{font-size:14px;line-height:1.375;margin-top:2px;overflow-wrap:anywhere}
+.eft{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;font-weight:500;color:var(--dc-muted)}
+.eft span{min-width:0}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:6px;font-weight:500;z-index:20;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;transition:opacity .15s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+
+@media (max-width:920px){
+  .work{grid-template-columns:minmax(0,1fr)}
+  .pane-preview{position:static}
+  .tabs{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;margin-bottom:6px;gap:8px}
+  .tabs button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px;font-weight:600;cursor:pointer}
+  .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+  .work[data-tab="edit"] .pane-preview{display:none}
+  .work[data-tab="preview"] .pane-edit{display:none}
+}
+@media (max-width:520px){
+  .frow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .prow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .frow .chk,.frow .btn{justify-self:start}
+  .top h1{font-size:25px}
+}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs><clipPath id="emc"><circle cx="32" cy="32" r="32"/></clipPath></defs>
+  <symbol id="emblem" viewBox="0 0 64 64">
+    <g clip-path="url(#emc)">
+      <rect width="64" height="64" fill="#14151a"/>
+      <path d="M-4 50 L68 28 L68 36 L-4 58Z" fill="#e10600"/>
+      <text x="32" y="38" text-anchor="middle" font-family="'Barlow Condensed','Arial Narrow',sans-serif" font-style="italic" font-weight="700" font-size="27" fill="#ffffff" letter-spacing="1">KLW</text>
+    </g>
+  </symbol>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <svg role="img" aria-label="Znak KLW"><use href="#emblem"/></svg>
+    <div class="grow">
+      <h1>Centrum Komunikatów KLW</h1>
+      <p>Liga F1 &middot; komunikaty organizacyjne w formacie wiadomości webhook</p>
+    </div>
+    <div class="pill">Następny numer: <b id="nextNum">1</b></div>
+  </header>
+
+  <nav class="tabs" aria-label="Widok">
+    <button type="button" id="tabEdit" aria-pressed="true">Edycja</button>
+    <button type="button" id="tabView" aria-pressed="false">Podgląd</button>
+  </nav>
+
+  <main class="work" id="work" data-tab="edit">
+    <section class="pane pane-edit" aria-label="Edytor komunikatu">
+
+      <div class="card">
+        <h2>Format wiadomości</h2>
+        <div class="seg" role="group" aria-label="Format wiadomości">
+          <button type="button" id="modeEmbed" aria-pressed="true">Kolorowe sekcje</button>
+          <button type="button" id="modeText" aria-pressed="false">Zwykły tekst</button>
+        </div>
+        <p class="hint">Sekcje wyglądają jak ogłoszenia z kolorowymi paskami. Zwykły tekst to wiadomość jak z czatu, z listą punktów i wzmiankami.</p>
+      </div>
+
+      <div class="card">
+        <h2>Szablon</h2>
+        <div class="chips" id="tpls" role="group" aria-label="Szablony komunikatów"></div>
+        <p class="hint">Szablon podmienia wszystkie sekcje i wzmianki. Numer, datę i nadawcę zostawia bez zmian.</p>
+      </div>
+
+      <div class="card">
+        <h2>Wydarzenie i termin</h2>
+        <div class="grid">
+          <label class="fld"><span>Sezon</span><input type="number" id="season" data-k="season" min="2000" max="2100"></label>
+          <label class="fld"><span>Numer komunikatu</span>
+            <div class="inline"><input type="number" id="num" data-k="num" min="1" max="999"><button type="button" class="btn sm" id="btnNext" title="Ustaw następny wolny numer">Kolejny</button></div>
+          </label>
+          <label class="fld"><span>Runda</span><input type="text" id="round" data-k="round" list="gps" maxlength="80" autocomplete="off"></label>
+          <label class="fld"><span>Data</span><input type="date" id="date" data-k="date"></label>
+          <label class="fld"><span>Godzina</span>
+            <div class="inline"><input type="time" id="time" data-k="time"><button type="button" class="btn sm" id="btnNow">Teraz</button></div>
+          </label>
+        </div>
+        <datalist id="gps"></datalist>
+      </div>
+
+      <div class="card">
+        <h2>Nadawca i adresaci</h2>
+        <div class="stack">
+          <div class="grid">
+            <label class="fld"><span>Nazwa webhooka</span><input type="text" id="bot" data-k="bot" maxlength="80"></label>
+          </div>
+          <div>
+            <div class="lab">Wzmianki nad komunikatem</div>
+            <div class="chips" id="mentions" role="group" aria-label="Wzmianki"></div>
+          </div>
+          <label class="fld"><span>Dodatkowy tekst nad embedem (opcjonalnie)</span><input type="text" id="extra" data-k="extra" maxlength="300" placeholder="np. Prosimy o zapoznanie się z treścią."></label>
+          <label class="fld"><span>Adres avatara webhooka (opcjonalnie, trafia tylko do JSON)</span><input type="url" id="avatar" data-k="avatar" placeholder="https://..." autocomplete="off"></label>
+        </div>
+      </div>
+
+      <div class="card" id="cardSecs">
+        <h2>Sekcje komunikatu</h2>
+        <div class="stack" id="secs"></div>
+        <div class="btns" style="margin-top:12px"><button type="button" class="btn" id="btnAddSec">Dodaj sekcję</button></div>
+        <p class="hint">Każda sekcja to osobny kolorowy blok w tej samej wiadomości. Discord pozwala na 10 sekcji i 6000 znaków łącznie. Stopka i czas pojawiają się pod ostatnią sekcją.</p>
+      </div>
+
+      <div class="card" id="cardText" hidden>
+        <h2>Treść wiadomości</h2>
+        <label class="fld"><span>Tekst <em id="cText">0/2000</em></span><textarea id="text" data-k="text" maxlength="2100" style="min-height:260px"></textarea></label>
+        <p class="hint">Obsługiwane: lista numerowana (1. 2. 3.), lista punktów (-), **pogrubienie**, *kursywa*, &gt; cytat i wzmianki z listy poniżej. Limit Discorda to 2000 znaków łącznie z wzmiankami.</p>
+      </div>
+
+      <div class="card">
+        <h2>Osoby i role do wzmianek</h2>
+        <div id="people"></div>
+        <div class="btns"><button type="button" class="btn sm" id="btnAddPerson">Dodaj osobę lub rolę</button></div>
+        <p class="hint">Wpisz w tekście nazwę dokładnie tak jak na liście (np. @Admin). W podglądzie będzie plakietką, a po wysłaniu zamieni się na prawdziwą wzmiankę, jeśli podasz ID. ID skopiujesz w Discordzie po włączeniu trybu dewelopera (Ustawienia użytkownika, Zaawansowane): prawy przycisk na osobie lub roli, Kopiuj ID. Role z paska wzmianek nad komunikatem też korzystają z tej listy.</p>
+      </div>
+
+      <div class="card" id="cardFoot">
+        <h2>Stopka</h2>
+        <div class="stack">
+          <label class="fld"><span>Tekst stopki</span><input type="text" id="footer" data-k="footer" maxlength="2048"></label>
+          <p class="hint" style="margin-top:-6px">Zmienne: {sezon}, {nr}, {runda}.</p>
+          <label class="chk"><input type="checkbox" id="ts" data-k="ts"> Pokaż znacznik czasu w stopce i przy nazwie</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Historia komunikatów</h2>
+        <ul class="hist" id="hist"></ul>
+        <div class="btns" style="margin-top:12px">
+          <button type="button" class="btn sm" id="btnBackup" hidden>Zapisz kopię zapasową</button>
+          <button type="button" class="btn sm" id="btnImport">Wczytaj kopię</button>
+          <input type="file" id="fileImport" accept="application/json,.json" hidden>
+        </div>
+        <p class="hint">Historia jest zapisana w tej przeglądarce. Kopia zapasowa pozwala przenieść ją na inne urządzenie.</p>
+      </div>
+    </section>
+
+    <section class="pane pane-preview" aria-label="Podgląd wiadomości">
+      <div class="pvbar">
+        <div class="seg" role="group" aria-label="Motyw podglądu">
+          <button type="button" id="thDark" aria-pressed="true">Ciemny</button>
+          <button type="button" id="thLight" aria-pressed="false">Jasny</button>
+        </div>
+        <div class="meter" id="meter" aria-live="polite"></div>
+      </div>
+
+      <div class="dc" id="dc" data-dc="dark" aria-label="Podgląd wiadomości webhook"></div>
+
+      <div class="card">
+        <h2>Wyślij na serwer</h2>
+        <div class="stack">
+          <label class="fld"><span>Adres webhooka <em id="whState"></em></span>
+            <div class="inline"><input type="password" id="whUrl" autocomplete="off" spellcheck="false" placeholder="https://discord.com/api/webhooks/..."><button type="button" class="btn sm" id="btnShowUrl">Pokaż</button></div>
+          </label>
+          <label class="chk"><input type="checkbox" id="whRemember"> Zapamiętaj adres w tej przeglądarce</label>
+          <div class="btns"><button type="button" class="btn pri" id="btnSend">Wyślij komunikat</button></div>
+          <p class="hint" id="sendStatus" role="status" aria-live="polite" style="margin:0"></p>
+          <p class="hint" id="sendNote" style="margin:0">Adres webhooka działa jak hasło: każdy, kto go zna, może pisać na Twoim kanale. Nie trafia do historii, szkicu ani plików .json.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Eksport i historia</h2>
+        <div class="btns">
+          <button type="button" class="btn" id="btnJson">Kopiuj JSON webhooka</button>
+          <button type="button" class="btn" id="btnMd">Kopiuj jako tekst</button>
+          <button type="button" class="btn" id="btnSaveJson" hidden>Zapisz plik .json</button>
+        </div>
+        <div class="btns" style="margin-top:8px">
+          <button type="button" class="btn" id="btnStore">Zapisz w historii</button>
+          <button type="button" class="btn ghost" id="btnNew">Nowy komunikat</button>
+        </div>
+        <p class="hint">JSON możesz też wkleić w narzędziu do webhooków (np. Discohook) albo użyć we własnym bocie.</p>
+        <details class="json" style="margin-top:10px">
+          <summary>Pokaż JSON</summary>
+          <textarea id="jsonOut" readonly spellcheck="false" aria-label="JSON webhooka"></textarea>
+        </details>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var KEY_H='klw.history.v1',KEY_D='klw.draft.v1',KEY_T='klw.theme.v1';
+function lsGet(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function pad(n){return (n<10?'0':'')+n}
+
+var COLORS=[['#e10600','Czerwony'],['#f59e0b','Bursztynowy'],['#1d9bf0','Niebieski'],['#23a55a','Zielony'],['#9b59b6','Fioletowy'],['#5865f2','Indygo'],['#6b7280','Szary']];
+var MENTIONS=['@Zawodnicy','@Kierownicy zespołów','@Komisarze','@Rezerwowi','@everyone'];
+var GPS=['Grand Prix Australii','Grand Prix Chin','Grand Prix Japonii','Grand Prix Bahrajnu','Grand Prix Arabii Saudyjskiej','Grand Prix Miami','Grand Prix Kanady','Grand Prix Monako','Grand Prix Barcelony','Grand Prix Austrii','Grand Prix Wielkiej Brytanii','Grand Prix Belgii','Grand Prix Węgier','Grand Prix Holandii','Grand Prix Włoch','Grand Prix Hiszpanii (Madryt)','Grand Prix Azerbejdżanu','Grand Prix Singapuru','Grand Prix USA','Grand Prix Meksyku','Grand Prix Brazylii','Grand Prix Las Vegas','Grand Prix Kataru','Grand Prix Abu Zabi'];
+
+function E(color,title,desc,fields){return{color:color,title:title,desc:desc,fields:fields||[]}}
+function T(id,label,color,mentions,title,desc,fields){return{id:id,label:label,mentions:mentions,embeds:[E(color,title,desc,fields)]}}
+var TPL=[
+ {id:'administracja',label:'Komunikat Administracji (wiele sekcji)',noAuthor:true,mentions:['@everyone'],embeds:[
+  E('#5865f2','📢 KOMUNIKAT ADMINISTRACJI KLW','Cześć wszystkim! 👋\n\nChcemy odnieść się do kilku ostatnich sytuacji, które wywołały dyskusję, i wyjaśnić powody naszych decyzji. Zależy nam, żeby każdy wiedział, skąd się one wzięły i co zamierzamy poprawić.'),
+  E('#1d9bf0','🏎️ 1. Kilka słów o naszej lidze','**KLW to liga tworzona przez amatorów, dla amatorów, po to, żeby wspólnie się ścigać i dobrze bawić.**\n\nNie jesteśmy profesjonalną organizacją esportową. Jako administracja popełniamy błędy i będziemy je poprawiać.\n\nNie oczekujemy, że zawsze się z nami zgodzicie. Prosimy tylko, żebyście czasem spojrzeli na daną sprawę także z naszej perspektywy.'),
+  E('#f59e0b','⚖️ 2. Doprecyzowanie przepisów o punktach karnych','Po przeanalizowaniu kilku ostatnich zdarzeń uznaliśmy, że w regulaminie jest luka, która prowadziła do niespójnych rozstrzygnięć. Dlatego Komisja Sportowa zdecydowała się doprecyzować zasady przyznawania punktów karnych.\n\nRozumiemy, że zmiana może budzić kontrowersje. **Nie wpływa ona na wyniki rozegranych już rund.**\n\nNie chodzi o to, kto jest kierowcą, tylko o problem z regulaminem. Takie sytuacje pokazują nam, co trzeba doprecyzować, aby w przyszłości uniknąć niejasności.'),
+  E('#e10600','🔴 3. Sesja z ostatniego weekendu','Podczas wyścigu doszło do kilku incydentów w pierwszym zakręcie. Komisarze przeanalizowali nagrania, a ich rozstrzygnięcia znajdziecie na kanale **#decyzje-komisarzy**.\n\nPrzypominamy, że odwołania można składać w ciągu **24 godzin** od publikacji decyzji.'),
+  E('#23a55a','✅ Co dalej','- Doprecyzujemy artykuły regulaminu dotyczące kar.\n- Przed każdą rundą publikujemy listę komisarzy.\n- Pytania i uwagi można zgłaszać administracji na kanale **#kontakt**.\n\nDziękujemy za cierpliwość i dobrą atmosferę.')]},
+ {id:'tekst',label:'Zwykły tekst (lista punktów)',mode:'text',mentions:['@everyone'],people:[{name:'@Admin',kind:'role',id:'',color:'#9b59b6'}],
+  text:'1. Jesteśmy ligą tworzoną dla zabawy, przez amatorów i dla amatorskiego ścigania. Jako administracja będziemy popełniać błędy, ale staramy się każdą sytuację ocenić i wyciągnąć z niej wnioski.\n2. Odnośnie sytuacji z [temat sprawy]:\nuznaliśmy, że [decyzja i jej powód].\n3. Odnośnie problemów z sesją z [data]: rozumiemy frustrację, ale prosimy o [prośba do zawodników]. Z naszej perspektywy widzieliśmy, że [opis zdarzenia], więc nie mieliśmy podstaw do [decyzja].\n4. Analizując sytuację, wprowadzamy uprawnienia do restartowania sesji dla każdego admina w sesji. @Admin restartując sesję, bierze pełną odpowiedzialność za ten krok i powinien wyjaśnić jego powód. Jeśli restart był nieuzasadniony, traci uprawnienia do restartów.'},
+ T('godzina','Zmiana godziny sesji','#f59e0b',['@Zawodnicy','@Kierownicy zespołów'],
+  'Zmiana godziny rozpoczęcia sesji kwalifikacyjnej',
+  'Dyrekcja Wyścigu informuje, że godzina rozpoczęcia kwalifikacji do rundy **{runda}** została zmieniona.\n\n- Sesje treningowe odbywają się bez zmian.\n- Wyścig startuje o pierwotnie ogłoszonej godzinie.\n- Zawodnicy muszą być na serwerze **15 minut** przed startem sesji.\n\n> Zmiana obowiązuje od chwili publikacji komunikatu.',
+  [{name:'Poprzednio',value:'20:00',inline:true},{name:'Obecnie',value:'20:30',inline:true},{name:'Strefa czasowa',value:'CET',inline:true}]),
+ T('odprawa','Odprawa zawodników','#1d9bf0',['@Zawodnicy','@Kierownicy zespołów'],
+  'Odprawa zawodników przed rundą',
+  'Dyrekcja Wyścigu zaprasza na obowiązkową odprawę przed rundą **{runda}**.\n\n### Program\n1. Omówienie toru i stref DRS\n2. Procedura startu i neutralizacji\n3. Pytania zawodników\n\nNieobecność należy zgłosić Sekretariatowi Ligi najpóźniej **godzinę** przed odprawą.',
+  [{name:'Termin',value:'Piątek, 19:30',inline:true},{name:'Kanał',value:'#odprawa (głosowy)',inline:true},{name:'Obecność',value:'Obowiązkowa',inline:true}]),
+ T('zapisy','Zamknięcie listy zgłoszeń','#23a55a',['@Zawodnicy'],
+  'Zamknięcie listy zgłoszeń',
+  'Lista zgłoszeń do rundy **{runda}** zostaje zamknięta.\n\n- Zmiany w składach po tym terminie wymagają zgody Dyrekcji Wyścigu.\n- Zawodnicy rezerwowi pozostają na liście oczekujących.\n- Potwierdzenie obecności należy złożyć u Sekretariatu Ligi.',
+  [{name:'Termin zamknięcia',value:'Środa, 23:59',inline:true},{name:'Zgłoszeni',value:'20 / 20',inline:true}]),
+ T('regulamin','Zmiana regulaminu','#e10600',['@Zawodnicy','@Kierownicy zespołów','@Komisarze'],
+  'Aktualizacja Regulaminu Sportowego',
+  'Zarząd Ligi wprowadza zmianę w Regulaminie Sportowym **KLW Liga F1 {sezon}**, obowiązującą od rundy **{runda}**.\n\n### Zakres zmiany\n- Art. 27.3: zmiana procedury ponownego startu po czerwonej fladze.\n- Art. 31.1: doprecyzowanie zasad dotyczących limitów toru.\n\nPełna treść regulaminu jest dostępna na kanale **#regulamin**.',
+  [{name:'Obowiązuje od',value:'{runda}',inline:true},{name:'Zatwierdził',value:'Zarząd Ligi',inline:true}]),
+ T('przerwa','Przerwa w kalendarzu','#6b7280',['@Zawodnicy'],
+  'Przerwa w kalendarzu ligi',
+  'Informujemy, że po rundzie **{runda}** następuje przerwa w rozgrywkach.\n\n- Kolejna runda odbędzie się zgodnie z terminarzem.\n- W czasie przerwy liga nie organizuje sesji treningowych.\n- Aktualny terminarz znajduje się w przypiętej wiadomości na kanale terminarza.',
+  [{name:'Ostatnia runda',value:'{runda}',inline:true},{name:'Wznowienie',value:'Zgodnie z terminarzem',inline:true}])
+];
+
+function nowParts(){var d=new Date();return{date:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),time:pad(d.getHours())+':'+pad(d.getMinutes())}}
+function blank(){var n=nowParts();return{
+  season:2026,num:1,round:'Grand Prix Brazylii',date:n.date,time:n.time,
+  bot:'KLW Komunikaty',avatar:'',mentions:[],extra:'',footer:'KLW Liga F1 • Sezon {sezon} • Komunikat nr {nr}',ts:true,mode:'embed',text:'',people:[{name:'@Zawodnicy',kind:'role',id:'',color:''},{name:'@Kierownicy zespołów',kind:'role',id:'',color:''},{name:'@Komisarze',kind:'role',id:'',color:''},{name:'@Rezerwowi',kind:'role',id:'',color:''},{name:'@Admin',kind:'role',id:'',color:'#9b59b6'}],
+  embeds:[{color:'#e10600',author:'Dyrekcja Wyścigu · KLW',title:'',desc:'',fields:[]}]}}
+
+function str(v,d,max){return typeof v==='string'?v.slice(0,max||5000):d}
+function normPerson(p){p=p&&typeof p==='object'?p:{};return{name:str(p.name,'',80).trim(),kind:p.kind==='role'?'role':'user',id:/^\d{15,25}$/.test(p.id)?p.id:'',color:/^#[0-9a-f]{6}$/i.test(p.color)?p.color:''}}
+function normEmbed(e){
+  e=e&&typeof e==='object'?e:{};
+  return{color:/^#[0-9a-f]{6}$/i.test(e.color)?e.color:'#e10600',author:str(e.author,'',256),title:str(e.title,'',300),desc:str(e.desc,'',4200),
+    fields:Array.isArray(e.fields)?e.fields.slice(0,25).map(function(f){f=f||{};return{name:str(f.name,'',256),value:str(f.value,'',1024),inline:!!f.inline}}):[]};
+}
+function norm(x){
+  var b=blank();if(!x||typeof x!=='object')return b;
+  b.season=isFinite(x.season)&&x.season!==''?Number(x.season):b.season;
+  b.num=isFinite(x.num)&&x.num!==''?Number(x.num):b.num;
+  b.round=str(x.round,b.round,80);b.date=/^\d{4}-\d\d-\d\d$/.test(x.date)?x.date:b.date;b.time=/^\d\d:\d\d$/.test(x.time)?x.time:b.time;
+  b.bot=str(x.bot,b.bot,80);b.avatar=str(x.avatar,'',500);b.extra=str(x.extra,'',300);
+  b.footer=str(x.footer,b.footer,2048);b.ts=x.ts!==false;
+  b.mentions=Array.isArray(x.mentions)?x.mentions.filter(function(m){return typeof m==='string'}).slice(0,10):[];
+  b.mode=x.mode==='text'?'text':'embed';b.text=str(x.text,'',2100);
+  if(Array.isArray(x.people))b.people=x.people.slice(0,30).map(normPerson);
+  if(x.roleIds&&typeof x.roleIds==='object'){Object.keys(x.roleIds).forEach(function(k){var v=x.roleIds[k];if(typeof v==='string'&&/^\d{15,25}$/.test(v)){var f=b.people.filter(function(p){return p.name===k})[0];if(f)f.id=v;else if(b.people.length<30)b.people.push({name:k.slice(0,80),kind:'role',id:v,color:''})}})}
+  if(Array.isArray(x.embeds)&&x.embeds.length)b.embeds=x.embeds.slice(0,10).map(normEmbed);
+  else b.embeds=[normEmbed({color:x.color,author:x.author===undefined?'Dyrekcja Wyścigu · KLW':x.author,title:x.title,desc:x.desc,fields:x.fields})];
+  return b}
+
+/* ---- mention definitions (people and roles) ---- */
+var MENT=[],TAIL='(?![\\p{L}\\p{N}_])';
+function rxe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function rgba(h,al){return 'rgba('+parseInt(h.slice(1,3),16)+','+parseInt(h.slice(3,5),16)+','+parseInt(h.slice(5,7),16)+','+al+')'}
+function byLen(list){return list.filter(function(d){return d.name.length>1}).sort(function(x,y){return y.name.length-x.name.length})}
+function pill(d){return '<span class="mention"'+(d.kind==='role'&&d.color?' style="color:'+d.color+';background:'+rgba(d.color,.12)+'"':'')+'>'+esc(d.name)+'</span>'}
+
+/* ---- Discord-flavoured markdown ---- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function inline(s){
+  var tk=[];function keep(h){tk.push(h);return '\u0001'+(tk.length-1)+'\u0001'}
+  s=esc(s);
+  s=s.replace(/`([^`\n]+)`/g,function(_,c){return keep('<code>'+c+'</code>')});
+  s=s.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,function(_,t,u){return keep('<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+t+'</a>')});
+  byLen(MENT).forEach(function(d){s=s.replace(new RegExp(rxe(esc(d.name))+TAIL,'gu'),function(){return keep(pill(d))})});
+  s=s.replace(/\*\*\*([^*\n]+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+     .replace(/\*\*([^*\n]+?)\*\*/g,'<strong>$1</strong>')
+     .replace(/__([^_\n]+?)__/g,'<u>$1</u>')
+     .replace(/\*([^*\n]+?)\*/g,'<em>$1</em>')
+     .replace(/(^|[^\w])_([^_\n]+?)_(?!\w)/g,'$1<em>$2</em>')
+     .replace(/~~([^~\n]+?)~~/g,'<s>$1</s>')
+     .replace(/(^|[\s>(])@(everyone|here)\b/g,'$1<span class="mention">@$2</span>')
+     .replace(/&lt;@&amp;\d+&gt;/g,'<span class="mention">@rola</span>')
+     .replace(/&lt;@!?\d+&gt;/g,'<span class="mention">@użytkownik</span>')
+     .replace(/&lt;#\d+&gt;/g,'<span class="mention">#kanał</span>');
+  return s.replace(/\u0001(\d+)\u0001/g,function(_,i){return tk[i]});
+}
+function renderMd(src){
+  var L=String(src).replace(/\r/g,'').split('\n'),out=[],i=0,list=null,m;
+  function close(){if(list){out.push('</'+list+'>');list=null}}
+  while(i<L.length){
+    var ln=L[i];
+    if(/^```/.test(ln)){var buf=[];i++;while(i<L.length&&!/^```/.test(L[i])){buf.push(L[i]);i++}i++;close();out.push('<pre><code>'+esc(buf.join('\n'))+'</code></pre>');continue}
+    if((m=ln.match(/^(#{1,3})\s+(.+)$/))){close();out.push('<h'+m[1].length+'>'+inline(m[2])+'</h'+m[1].length+'>');i++;continue}
+    if((m=ln.match(/^\s*[-*•]\s+(.+)$/))){if(list!=='ul'){close();out.push('<ul>');list='ul'}out.push('<li>'+inline(m[1])+'</li>');i++;continue}
+    if((m=ln.match(/^\s*(\d+)[.)]\s+(.+)$/))){if(list!=='ol'){close();out.push('<ol start="'+m[1]+'">');list='ol'}out.push('<li>'+inline(m[2])+'</li>');i++;continue}
+    if((m=ln.match(/^>\s?(.*)$/))){close();var q=[m[1]];i++;while(i<L.length&&(m=L[i].match(/^>\s?(.*)$/))){q.push(m[1]);i++}out.push('<blockquote>'+q.map(inline).join('<br>')+'</blockquote>');continue}
+    close();out.push(ln.trim()===''?'<div class="sp"></div>':'<div>'+inline(ln)+'</div>');i++;
+  }
+  close();return out.join('');
+}
+
+
+/* ---- state ---- */
+var hadDraft=!!lsGet(KEY_D,null);
+var S=norm(lsGet(KEY_D,null)),hist=lsGet(KEY_H,[]);
+if(!Array.isArray(hist))hist=[];
+hist=hist.filter(function(h){return h&&typeof h==='object'&&h.state}).map(function(h){return{id:String(h.id||Date.now()+Math.random()),savedAt:Number(h.savedAt)||0,sentAt:Number(h.sentAt)||0,state:norm(h.state)}});
+var dl=null,dcTheme=lsGet(KEY_T,'dark')==='light'?'light':'dark',saveTimer=0,armNew=0;
+
+function saveHist(){lsSet(KEY_H,hist)}
+function storeCurrent(sentAt){
+  var cur=norm(S),i=hist.findIndex(function(h){return h.state.season===cur.season&&h.state.num===cur.num});
+  var e={id:i>=0?hist[i].id:String(Date.now())+Math.random().toString(36).slice(2,6),savedAt:Date.now(),sentAt:sentAt||(i>=0?hist[i].sentAt:0)||0,state:cur};
+  if(i>=0)hist[i]=e;else hist.push(e);
+  if(hist.length>200){hist.sort(function(a,b){return b.savedAt-a.savedAt});hist=hist.slice(0,200)}
+  saveHist();renderHist();update();
+}
+function nextNum(season){var mx=0;hist.forEach(function(h){if(h.state.season===season&&h.state.num>mx)mx=h.state.num});return mx+1}
+function fmtDate(iso){var p=String(iso).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:iso}
+function sub(t){return String(t).replace(/\{sezon\}/g,S.season).replace(/\{nr\}/g,S.num).replace(/\{runda\}/g,S.round)}
+function when(){var d=new Date(S.date+'T'+S.time);return isNaN(d.getTime())?new Date():d}
+function dcTime(d){
+  var n=new Date(),y=new Date(n);y.setDate(n.getDate()-1);var t=pad(d.getHours())+':'+pad(d.getMinutes());
+  if(d.toDateString()===n.toDateString())return 'Dzisiaj o '+t;
+  if(d.toDateString()===y.toDateString())return 'Wczoraj o '+t;
+  return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+t;
+}
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},2400)}
+
+/* ---- webhook payload ---- */
+function subM(t){
+  byLen(S.people.filter(function(d){return d.id})).forEach(function(d){
+    t=t.replace(new RegExp(rxe(d.name)+TAIL,'gu'),function(){return d.kind==='role'?'<@&'+d.id+'>':'<@'+d.id+'>'});
+  });
+  return t;
+}
+function contentSend(){return subM(S.mentions.join(' ')+(S.mentions.length&&S.extra?'\n':'')+S.extra)}
+function msgText(){var h=contentSend(),t=subM(S.text);return h&&t?h+'\n\n'+t:(h||t)}
+function hasBody(){return S.mode==='text'?msgText().trim().length>0:(liveEmbeds().length>0||contentText().length>0)}
+function contentText(){return S.mentions.join(' ')+(S.mentions.length&&S.extra?'\n':'')+S.extra}
+function goodFields(x){return x.fields.filter(function(f){return f.name&&f.value})}
+function liveEmbeds(){return S.embeds.filter(function(e){return e.title||e.desc||e.author||goodFields(e).length})}
+function payload(){
+  if(S.mode==='text'){var q={username:S.bot||'KLW Komunikaty'};if(S.avatar)q.avatar_url=S.avatar;var tc=msgText();if(tc)q.content=tc;return q}
+  var list=liveEmbeds(),ft=sub(S.footer);
+  var es=list.map(function(x,i){
+    var e={};
+    if(x.author)e.author={name:x.author};
+    if(x.title)e.title=x.title;
+    if(x.desc)e.description=subM(x.desc);
+    e.color=parseInt(x.color.slice(1),16);
+    var fs=goodFields(x).map(function(f){return{name:f.name,value:subM(f.value),inline:!!f.inline}});
+    if(fs.length)e.fields=fs;
+    if(i===list.length-1){if(ft)e.footer={text:ft};if(S.ts)e.timestamp=when().toISOString()}
+    return e;
+  });
+  var p={username:S.bot||'KLW Komunikaty'};
+  if(S.avatar)p.avatar_url=S.avatar;
+  var c=contentSend();if(c)p.content=c;
+  p.embeds=es;return p;
+}
+function plain(){
+  if(S.mode==='text')return msgText();
+  var p=[],c=contentSend();
+  if(c)p.push(c);
+  liveEmbeds().forEach(function(x){
+    var s=[];
+    if(x.title)s.push('**'+x.title+'**');
+    if(x.desc)s.push(subM(x.desc));
+    var fs=goodFields(x).map(function(f){return '**'+f.name+':** '+subM(f.value)});
+    if(fs.length)s.push(fs.join('\n'));
+    p.push(s.join('\n\n'));
+  });
+  var ft=sub(S.footer);if(ft)p.push('-# '+ft);
+  return p.join('\n\n');
+}
+
+/* ---- preview ---- */
+var AV='<svg role="img" aria-label="Znak KLW"><use href="#emblem"/></svg>';
+function embedHtml(x,foot){
+  var fs=goodFields(x);
+  var h='<div class="embed" style="border-left-color:'+x.color+'">';
+  if(x.author)h+='<div class="ea">'+AV+'<span>'+esc(x.author)+'</span></div>';
+  if(x.title)h+='<div class="et">'+esc(x.title)+'</div>';
+  if(x.desc)h+='<div class="ed">'+renderMd(x.desc)+'</div>';
+  if(fs.length)h+='<div class="ef">'+fs.map(function(f){return '<div class="'+(f.inline?'':'full')+'"><div class="fn">'+esc(f.name)+'</div><div class="fv">'+renderMd(f.value)+'</div></div>'}).join('')+'</div>';
+  return h+(foot||'')+'</div>';
+}
+function view(){
+  var d=when(),tm=dcTime(d),ft=sub(S.footer);
+  var pills=S.mentions.map(function(m){return '<span class="mention">'+esc(m)+'</span>'}).join(' ');
+  var ex=S.extra?inline(S.extra):'';
+  var content=pills+(pills&&ex?'<br>':'')+ex;
+  if(S.mode==='text'){
+    var bd=S.text?renderMd(S.text):'',all=content+(content&&bd?'<div class="sp"></div>':'')+bd;
+    return '<div class="msg"><div class="av">'+AV+'</div><div class="mb"><div class="mh"><span class="mn">'+esc(S.bot||'KLW Komunikaty')+'</span><span class="app">APP</span><time>'+tm+'</time></div>'+(all?'<div class="mc">'+all+'</div>':'<div class="mc" style="color:var(--dc-muted)">Wpisz treść wiadomości albo wybierz szablon.</div>')+'</div></div>';
+  }
+  var foot=(ft||S.ts)?'<div class="eft">'+AV+'<span>'+esc(ft)+(ft&&S.ts?' • ':'')+(S.ts?tm:'')+'</span></div>':'';
+  var list=liveEmbeds(),e='';
+  if(!list.length)e='<div class="embed" style="border-left-color:'+S.embeds[0].color+'"><div class="ed" style="color:var(--dc-muted)">Dodaj sekcję z tytułem i treścią albo wybierz szablon.</div>'+foot+'</div>';
+  else e=list.map(function(x,i){return embedHtml(x,i===list.length-1?foot:'')}).join('');
+  return '<div class="msg"><div class="av">'+AV+'</div><div class="mb"><div class="mh"><span class="mn">'+esc(S.bot||'KLW Komunikaty')+'</span><span class="app">APP</span><time>'+tm+'</time></div>'+(content?'<div class="mc">'+content+'</div>':'')+e+'</div></div>';
+}
+function update(){
+  MENT=S.people;
+  $('#dc').innerHTML=view();
+  var list=liveEmbeds(),total=sub(S.footer).length,bad=S.embeds.length>10;
+  list.forEach(function(x){
+    total+=x.title.length+x.desc.length+x.author.length+x.fields.reduce(function(a,f){return a+f.name.length+f.value.length},0);
+    if(x.title.length>256||x.desc.length>4096||x.fields.length>25)bad=true;
+  });
+  $$('#secs .sec').forEach(function(s){s._count()});
+  var m=$('#meter'),tx=msgText().length;
+  if(S.mode==='text'){m.textContent='Wiadomość: '+tx+' / 2000 znaków';m.classList.toggle('over',tx>2000);var ct=$('#cText');ct.textContent=S.text.length+'/2000';ct.classList.toggle('over',tx>2000)}
+  else{m.textContent='Wiadomość: '+total+' / 6000 znaków · sekcje: '+S.embeds.length+' / 10';m.classList.toggle('over',total>6000||bad)}
+  $('#jsonOut').value=JSON.stringify(payload(),null,2);
+  $('#nextNum').textContent=nextNum(Number(S.season)||2026);
+  $('#btnAddSec').disabled=S.embeds.length>=10;
+  clearTimeout(saveTimer);saveTimer=setTimeout(function(){lsSet(KEY_D,S)},400);
+}
+
+/* ---- editor pieces ---- */
+function btn(label,fn,cls){var b=document.createElement('button');b.type='button';b.className='btn sm '+(cls||'ghost');b.textContent=label;if(fn)b.addEventListener('click',fn);return b}
+function renderMentions(){
+  var box=$('#mentions');box.textContent='';
+  var all=MENTIONS.concat(S.mentions.filter(function(m){return MENTIONS.indexOf(m)<0}));
+  all.forEach(function(m){
+    var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=m;
+    b.setAttribute('aria-pressed',S.mentions.indexOf(m)>=0?'true':'false');
+    b.addEventListener('click',function(){
+      var i=S.mentions.indexOf(m);if(i>=0)S.mentions.splice(i,1);else S.mentions.push(m);
+      b.setAttribute('aria-pressed',i>=0?'false':'true');update();
+    });
+    box.appendChild(b);
+  });
+}
+var PCOL=[['','Domyślny'],['#9b59b6','Fioletowy'],['#e74c3c','Czerwony'],['#2ecc71','Zielony'],['#3498db','Niebieski'],['#f1c40f','Żółty'],['#e67e22','Pomarańczowy']];
+function renderPeople(){
+  var box=$('#people');box.textContent='';
+  if(!S.people.length){var p=document.createElement('p');p.className='empty';p.style.marginBottom='10px';p.textContent='Brak wpisów. Dodaj osobę lub rolę, aby używać jej we wzmiankach.';box.appendChild(p)}
+  S.people.forEach(function(d,i){
+    var row=document.createElement('div');row.className='prow';
+    row.innerHTML='<input type="text" class="p-name" maxlength="80" placeholder="@Nazwa" aria-label="Nazwa wzmianki" autocomplete="off"><select class="p-kind" aria-label="Rodzaj"><option value="user">Osoba</option><option value="role">Rola</option></select><input type="text" class="p-id" inputmode="numeric" placeholder="ID (opcjonalnie)" aria-label="ID w Discordzie" autocomplete="off"><select class="p-col" aria-label="Kolor roli"></select>';
+    var n=$('.p-name',row),k=$('.p-kind',row),id=$('.p-id',row),c=$('.p-col',row);
+    PCOL.forEach(function(x){var o=document.createElement('option');o.value=x[0];o.textContent=x[1];c.appendChild(o)});
+    n.value=d.name;k.value=d.kind;id.value=d.id;c.value=d.color;c.disabled=d.kind!=='role';
+    n.addEventListener('input',function(){d.name=n.value.trim();update()});
+    n.addEventListener('change',function(){if(n.value.trim()&&n.value.trim()[0]!=='@'){n.value='@'+n.value.trim();d.name=n.value;update()}});
+    k.addEventListener('change',function(){d.kind=k.value;c.disabled=d.kind!=='role';if(d.kind!=='role'){d.color='';c.value=''}update()});
+    id.addEventListener('input',function(){var v=id.value.trim();if(/^\d{15,25}$/.test(v)){d.id=v;id.removeAttribute('aria-invalid')}else{d.id='';if(v)id.setAttribute('aria-invalid','true');else id.removeAttribute('aria-invalid')}update()});
+    c.addEventListener('change',function(){d.color=c.value;update()});
+    row.appendChild(btn('Usuń',function(){S.people.splice(i,1);renderPeople();update()}));
+    box.appendChild(row);
+  });
+}
+function setMode(m,skip){
+  S.mode=m==='text'?'text':'embed';var t=S.mode==='text';
+  $('#modeEmbed').setAttribute('aria-pressed',t?'false':'true');$('#modeText').setAttribute('aria-pressed',t?'true':'false');
+  $('#cardSecs').hidden=t;$('#cardFoot').hidden=t;$('#cardText').hidden=!t;
+  if(!skip)update();
+}
+
+var EMOJI=['📢','🏁','🏎️','⚖️','🔴','🟢','🟡','⚠️','🚨','🛠️','📅','⏱️','✅','❌','🏆','ℹ️','👋','📝'];
+function secFields(box,x,addBtn){
+  box.textContent='';
+  x.fields.forEach(function(f,i){
+    var row=document.createElement('div');row.className='frow';
+    row.innerHTML='<input type="text" class="fn-i" maxlength="256" placeholder="Nazwa pola" aria-label="Nazwa pola"><input type="text" class="fv-i" maxlength="1024" placeholder="Wartość" aria-label="Wartość pola"><label class="chk"><input type="checkbox" class="fi-i"> w linii</label>';
+    var n=row.querySelector('.fn-i'),v=row.querySelector('.fv-i'),c=row.querySelector('.fi-i');
+    n.value=f.name;v.value=f.value;c.checked=!!f.inline;
+    n.addEventListener('input',function(){f.name=n.value;update()});
+    v.addEventListener('input',function(){f.value=v.value;update()});
+    c.addEventListener('change',function(){f.inline=c.checked;update()});
+    row.appendChild(btn('Usuń',function(){x.fields.splice(i,1);secFields(box,x,addBtn);update()}));
+    box.appendChild(row);
+  });
+  addBtn.disabled=x.fields.length>=25;
+}
+function secEl(x,i){
+  var sec=document.createElement('div');sec.className='sec';
+  sec.innerHTML='<div class="sechead"><b>Sekcja '+(i+1)+'</b><div class="btns s-ctl"></div></div>'
+   +'<div class="stack"><label class="fld"><span>Tytuł <em class="ct">0/256</em></span><input type="text" class="s-title" maxlength="300"></label>'
+   +'<div class="emo" role="group" aria-label="Wstaw emoji"></div>'
+   +'<label class="fld"><span>Treść <em class="cd">0/4096</em></span><textarea class="s-desc" maxlength="4200"></textarea></label>'
+   +'<div><div class="lab" style="margin-bottom:8px">Kolor paska</div><div class="sw" role="group" aria-label="Kolor paska"></div></div>'
+   +'<details class="json"><summary>Autor i pola</summary><div class="stack" style="margin-top:10px"><label class="fld"><span>Autor sekcji (opcjonalnie)</span><input type="text" class="s-author" maxlength="256"></label><div class="s-fields"></div><div class="btns"><button type="button" class="btn sm s-addf">Dodaj pole</button></div></div></details></div>';
+  var ti=$('.s-title',sec),de=$('.s-desc',sec),au=$('.s-author',sec),last=ti;
+  ti.value=x.title;de.value=x.desc;au.value=x.author;
+  ti.addEventListener('focus',function(){last=ti});de.addEventListener('focus',function(){last=de});
+  ti.addEventListener('input',function(){x.title=ti.value;update()});
+  de.addEventListener('input',function(){x.desc=de.value;update()});
+  au.addEventListener('input',function(){x.author=au.value;update()});
+  sec._count=function(){
+    var c=$('.ct',sec),d=$('.cd',sec);
+    c.textContent=x.title.length+'/256';c.classList.toggle('over',x.title.length>256);
+    d.textContent=x.desc.length+'/4096';d.classList.toggle('over',x.desc.length>4096);
+  };
+  var eb=$('.emo',sec);
+  EMOJI.forEach(function(em){
+    var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=em;b.setAttribute('aria-label','Wstaw '+em);
+    b.addEventListener('mousedown',function(ev){ev.preventDefault()});
+    b.addEventListener('click',function(){
+      var el=last,s=el.selectionStart==null?el.value.length:el.selectionStart,en=el.selectionEnd==null?s:el.selectionEnd;
+      el.value=el.value.slice(0,s)+em+el.value.slice(en);
+      var pos=s+em.length;el.focus();el.setSelectionRange(pos,pos);el.dispatchEvent(new Event('input'));
+    });
+    eb.appendChild(b);
+  });
+  var sw=$('.sw',sec),cl=COLORS.slice();
+  if(!COLORS.some(function(c){return c[0].toLowerCase()===x.color.toLowerCase()}))cl.push([x.color,'Własny']);
+  cl.forEach(function(c){
+    var b=document.createElement('button');b.type='button';b.style.background=c[0];b.title=c[1];b.setAttribute('aria-label',c[1]);
+    b.setAttribute('aria-pressed',c[0].toLowerCase()===x.color.toLowerCase()?'true':'false');
+    b.addEventListener('click',function(){x.color=c[0];$$('button',sw).forEach(function(o){o.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');update()});
+    sw.appendChild(b);
+  });
+  var fbox=$('.s-fields',sec),add=$('.s-addf',sec);
+  secFields(fbox,x,add);
+  add.addEventListener('click',function(){if(x.fields.length>=25)return;x.fields.push({name:'',value:'',inline:true});secFields(fbox,x,add);update();var r=$$('.fn-i',fbox);if(r.length)r[r.length-1].focus()});
+  var ctl=$('.s-ctl',sec);
+  ctl.appendChild(btn('W górę',function(){if(i<1)return;S.embeds.splice(i-1,0,S.embeds.splice(i,1)[0]);renderSecs();update()})).disabled=i===0;
+  ctl.appendChild(btn('W dół',function(){if(i>=S.embeds.length-1)return;S.embeds.splice(i+1,0,S.embeds.splice(i,1)[0]);renderSecs();update()})).disabled=i===S.embeds.length-1;
+  ctl.appendChild(btn('Powiel',function(){if(S.embeds.length>=10)return;S.embeds.splice(i+1,0,normEmbed(JSON.parse(JSON.stringify(x))));renderSecs();update()})).disabled=S.embeds.length>=10;
+  var del=btn('Usuń',null);del.disabled=S.embeds.length<2;
+  del.addEventListener('click',function(){
+    if(del.dataset.arm){S.embeds.splice(i,1);renderSecs();update()}
+    else{del.dataset.arm='1';del.textContent='Potwierdź';setTimeout(function(){del.dataset.arm='';del.textContent='Usuń'},3000)}
+  });
+  ctl.appendChild(del);
+  sec._count();
+  return sec;
+}
+function renderSecs(){
+  var box=$('#secs');box.textContent='';
+  S.embeds.forEach(function(x,i){box.appendChild(secEl(x,i))});
+}
+function renderHist(){
+  var ul=$('#hist');ul.textContent='';
+  if(!hist.length){var li=document.createElement('li');li.innerHTML='<p class="empty">Brak zapisanych komunikatów. Zapisz pierwszy przyciskiem „Zapisz w historii”.</p>';ul.appendChild(li);return}
+  hist.slice().sort(function(a,b){return b.savedAt-a.savedAt}).forEach(function(h){
+    var li=document.createElement('li'),t=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small'),bs=document.createElement('div');
+    var ttl=h.state.mode==='text'?(h.state.text.split('\n').filter(function(l){return l.trim()})[0]||'Bez tytułu').slice(0,70):((h.state.embeds.filter(function(e){return e.title})[0]||{}).title||'Bez tytułu');
+    var sent='';if(h.sentAt){var sd=new Date(h.sentAt);sent=' · wysłano '+pad(sd.getDate())+'.'+pad(sd.getMonth()+1)+' '+pad(sd.getHours())+':'+pad(sd.getMinutes())}
+    t.className='t';b.textContent='Nr '+h.state.num+' · '+ttl;
+    sm.textContent='Sezon '+h.state.season+' · '+h.state.round+' · '+fmtDate(h.state.date)+' '+h.state.time+sent;
+    t.appendChild(b);t.appendChild(sm);bs.className='btns';
+    bs.appendChild(btn('Wczytaj',function(){S=norm(h.state);sync();setTab('edit');toast('Wczytano komunikat nr '+S.num)}));
+    var d=btn('Usuń',null);
+    d.addEventListener('click',function(){
+      if(d.dataset.arm){hist=hist.filter(function(x){return x.id!==h.id});saveHist();renderHist();update();toast('Usunięto z historii')}
+      else{d.dataset.arm='1';d.textContent='Potwierdź';setTimeout(function(){d.dataset.arm='';d.textContent='Usuń'},3000)}
+    });
+    bs.appendChild(d);li.appendChild(t);li.appendChild(bs);ul.appendChild(li);
+  });
+}
+function applyTpl(t){
+  var f=function(x){return x.replace(/\{runda\}/g,S.round||'najbliższej rundy').replace(/\{sezon\}/g,S.season)};
+  S.mode=t.mode==='text'?'text':'embed';
+  S.mentions=t.mentions.slice();
+  (t.people||[]).forEach(function(d){
+    var ex=S.people.filter(function(p){return p.name===d.name})[0];
+    if(!ex&&S.people.length<30)S.people.push({name:d.name,kind:d.kind,id:d.id||'',color:d.color||''});
+  });
+  if(S.mode==='text'){S.text=f(t.text);return}
+  var au=t.noAuthor?'':(S.embeds[0]?S.embeds[0].author:'');
+  S.embeds=t.embeds.map(function(e,i){return{color:e.color,author:i===0?au:'',title:f(e.title),desc:f(e.desc),fields:e.fields.map(function(x){return{name:x.name,value:f(x.value),inline:!!x.inline}})}});
+}
+function renderTpls(){
+  var box=$('#tpls');
+  TPL.forEach(function(t){
+    var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.label;
+    b.addEventListener('click',function(){applyTpl(t);sync();toast('Wstawiono szablon: '+t.label)});
+    box.appendChild(b);
+  });
+}
+function sync(){
+  $$('[data-k]').forEach(function(el){var k=el.dataset.k;if(el.type==='checkbox')el.checked=!!S[k];else el.value=S[k]==null?'':S[k]});
+  renderMentions();renderPeople();renderSecs();setMode(S.mode,true);update();
+}
+function setTab(t){
+  $('#tabEdit').setAttribute('aria-pressed',t==='edit'?'true':'false');
+  $('#tabView').setAttribute('aria-pressed',t==='view'?'true':'false');
+  $('#work').dataset.tab=t==='view'?'preview':'edit';
+}
+function setTheme(t){
+  dcTheme=t;$('#dc').dataset.dc=t;
+  $('#thDark').setAttribute('aria-pressed',t==='dark'?'true':'false');
+  $('#thLight').setAttribute('aria-pressed',t==='light'?'true':'false');
+  lsSet(KEY_T,t);
+}
+
+/* ---- clipboard and files ---- */
+function copy(text,ok){
+  function fb(){
+    var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;opacity:0';
+    document.body.appendChild(ta);ta.select();var done=false;try{done=document.execCommand('copy')}catch(e){}
+    document.body.removeChild(ta);toast(done?ok:'Nie udało się skopiować. Otwórz „Pokaż JSON” i skopiuj ręcznie.');
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(ok)},fb)}else fb();
+}
+function saveFile(name,data){
+  if(!dl){toast('Zapis plików jest niedostępny w tym widoku. Użyj kopiowania.');return}
+  dl.save({filename:name,data:data}).then(function(){toast('Zapisano plik')},function(e){if(!e||e.code!=='declined')toast('Nie udało się zapisać pliku')});
+}
+function slug(){return 'komunikat-'+S.season+'-nr'+S.num}
+
+/* ---- wiring ---- */
+$$('[data-k]').forEach(function(el){
+  var h=function(){var k=el.dataset.k;S[k]=el.type==='checkbox'?el.checked:el.type==='number'?(el.value===''?'':Number(el.value)):el.value;update()};
+  el.addEventListener('input',h);el.addEventListener('change',h);
+});
+$('#tabEdit').addEventListener('click',function(){setTab('edit')});
+$('#tabView').addEventListener('click',function(){setTab('view')});
+$('#thDark').addEventListener('click',function(){setTheme('dark')});
+$('#thLight').addEventListener('click',function(){setTheme('light')});
+$('#btnNow').addEventListener('click',function(){var n=nowParts();S.date=n.date;S.time=n.time;$('#date').value=S.date;$('#time').value=S.time;update()});
+$('#btnNext').addEventListener('click',function(){S.num=nextNum(Number(S.season)||2026);$('#num').value=S.num;update()});
+$('#btnAddSec').addEventListener('click',function(){
+  if(S.embeds.length>=10)return;
+  S.embeds.push({color:COLORS[S.embeds.length%COLORS.length][0],author:'',title:'',desc:'',fields:[]});
+  renderSecs();update();var t=$$('#secs .s-title');if(t.length)t[t.length-1].focus();
+});
+$('#btnJson').addEventListener('click',function(){copy(JSON.stringify(payload(),null,2),'Skopiowano JSON webhooka')});
+$('#btnMd').addEventListener('click',function(){var t=plain();copy(t,t.length>2000?'Skopiowano. Tekst ma '+t.length+' znaków, a zwykła wiadomość na Discordzie mieści 2000.':'Skopiowano tekst komunikatu')});
+$('#btnSaveJson').addEventListener('click',function(){saveFile(slug()+'.json',JSON.stringify(payload(),null,2))});
+$('#btnBackup').addEventListener('click',function(){saveFile('klw-historia-komunikatow.json',JSON.stringify({app:'klw-komunikaty',version:1,history:hist},null,2))});
+$('#btnImport').addEventListener('click',function(){$('#fileImport').click()});
+$('#fileImport').addEventListener('change',function(ev){
+  var f=ev.target.files&&ev.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var j=JSON.parse(String(r.result)),arr=Array.isArray(j)?j:(j&&j.history);
+      if(!Array.isArray(arr))throw new Error('format');
+      var added=0;
+      arr.forEach(function(x){
+        if(!x||typeof x!=='object'||!x.state)return;
+        var e={id:String(x.id||Date.now()+Math.random()),savedAt:Number(x.savedAt)||0,sentAt:Number(x.sentAt)||0,state:norm(x.state)};
+        var i=hist.findIndex(function(h){return h.id===e.id});
+        if(i<0){hist.push(e);added++}else if(e.savedAt>hist[i].savedAt){hist[i]=e}
+      });
+      hist=hist.slice(0,200);saveHist();renderHist();update();toast('Wczytano kopię: '+added+' nowych komunikatów');
+    }catch(err){toast('To nie jest poprawna kopia zapasowa historii.')}
+    ev.target.value='';
+  };
+  r.readAsText(f);
+});
+$('#btnStore').addEventListener('click',function(){storeCurrent(0);toast('Zapisano komunikat nr '+S.num+' w historii')});
+$('#btnNew').addEventListener('click',function(){
+  var cur=norm(S),saved=hist.some(function(h){return JSON.stringify(h.state)===JSON.stringify(cur)});
+  if(!saved&&liveEmbeds().length&&Date.now()-armNew>4000){armNew=Date.now();toast('Są niezapisane zmiany. Kliknij ponownie, aby zacząć od nowa.');return}
+  var k=S;S=blank();S.season=k.season;S.bot=k.bot;S.avatar=k.avatar;S.footer=k.footer;S.round=k.round;S.people=k.people;S.mode=k.mode;S.embeds[0].author=k.embeds[0]?k.embeds[0].author:'';
+  S.num=nextNum(Number(S.season)||2026);armNew=0;sync();toast('Nowy komunikat nr '+S.num);
+});
+
+$('#modeEmbed').addEventListener('click',function(){setMode('embed')});
+$('#modeText').addEventListener('click',function(){setMode('text')});
+$('#btnAddPerson').addEventListener('click',function(){
+  if(S.people.length>=30)return;
+  S.people.push({name:'',kind:'user',id:'',color:''});renderPeople();update();
+  var r=$$('#people .p-name');if(r.length)r[r.length-1].focus();
+});
+
+/* ---- sending through a Discord webhook ---- */
+var KEY_W='klw.webhook.v1',inViewer=!!(window.claude&&window.claude.use),armSend=0,sending=false;
+function parseWebhook(raw){
+  raw=String(raw||'').trim();
+  if(!raw)return{ok:false,empty:true};
+  var u;try{u=new URL(raw)}catch(e){return{ok:false}}
+  if(u.protocol!=='https:'||['discord.com','discordapp.com','ptb.discord.com','canary.discord.com'].indexOf(u.hostname)<0)return{ok:false};
+  var m=u.pathname.match(/^\/api\/(?:v\d+\/)?webhooks\/(\d{15,25})\/([\w-]{20,})\/?$/);
+  if(!m)return{ok:false};
+  var q='wait=true',th=u.searchParams.get('thread_id');if(th&&/^\d{15,25}$/.test(th))q+='&thread_id='+th;
+  return{ok:true,id:m[1],url:'https://'+u.hostname+'/api/webhooks/'+m[1]+'/'+m[2]+'?'+q};
+}
+function setStatus(kind,msg){var s=$('#sendStatus');s.textContent=msg;s.className='hint'+(kind==='err'?' over':kind==='ok'?' okc':'')}
+function forgetUrl(){try{localStorage.removeItem(KEY_W)}catch(e){}}
+function checkUrl(){
+  var raw=$('#whUrl').value,st=$('#whState'),w=parseWebhook(raw);
+  if(!raw.trim()){st.textContent='';st.className=''}
+  else{st.textContent=w.ok?'poprawny adres':'niepoprawny adres';st.className=w.ok?'okc':'over'}
+  if($('#whRemember').checked){if(w.ok)lsSet(KEY_W,{url:raw.trim()});else forgetUrl()}
+}
+function sendNow(){
+  var b=$('#btnSend'),w=parseWebhook($('#whUrl').value);
+  function done(){sending=false;b.disabled=inViewer;b.textContent='Wyślij komunikat'}
+  sending=true;b.disabled=true;b.textContent='Wysyłanie…';setStatus('','');
+  fetch(w.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload())}).then(function(r){
+    return r.json().catch(function(){return{}}).then(function(j){
+      if(r.ok){
+        storeCurrent(Date.now());var d=new Date();
+        setStatus('ok','Wysłano o '+pad(d.getHours())+':'+pad(d.getMinutes())+'. Komunikat nr '+S.num+' zapisano w historii. Kliknij „Nowy komunikat”, aby przygotować kolejny.');
+        toast('Wysłano komunikat nr '+S.num);
+      }else if(r.status===429){setStatus('err','Discord prosi o chwilę przerwy. Spróbuj za '+Math.ceil(j.retry_after||1)+' s.')}
+      else if(r.status===401||r.status===404){setStatus('err','Ten webhook nie istnieje albo został usunięty. Sprawdź adres.')}
+      else if(r.status===400){setStatus('err','Discord odrzucił wiadomość'+(j.message?': '+j.message:'')+'. Sprawdź ID ról i długość pól.')}
+      else{setStatus('err','Discord zwrócił błąd '+r.status+'. Spróbuj ponownie za chwilę.')}
+    });
+  }).then(done,function(){
+    setStatus('err','Nie udało się połączyć z Discordem. Sprawdź internet.');done();
+  });
+}
+$('#whUrl').addEventListener('input',function(){armSend=0;checkUrl()});
+$('#whRemember').addEventListener('change',function(){if($('#whRemember').checked)checkUrl();else forgetUrl()});
+$('#btnShowUrl').addEventListener('click',function(){
+  var i=$('#whUrl'),show=i.type==='password';i.type=show?'text':'password';$('#btnShowUrl').textContent=show?'Ukryj':'Pokaż';
+});
+$('#btnSend').addEventListener('click',function(){
+  if(sending)return;
+  var b=$('#btnSend'),w=parseWebhook($('#whUrl').value);
+  if(!w.ok){setStatus('err',w.empty?'Wklej adres webhooka.':'To nie wygląda na adres webhooka Discorda (https://discord.com/api/webhooks/ID/TOKEN).');return}
+  if(!hasBody()){setStatus('err','Komunikat jest pusty. Dodaj sekcję z tytułem lub treścią.');return}
+  if($('#meter').classList.contains('over')){setStatus('err','Komunikat przekracza limity Discorda. Skróć tytuł, opis lub pola.');return}
+  if(Date.now()-armSend>5000){
+    armSend=Date.now();b.textContent='Potwierdź wysłanie nr '+S.num;
+    setStatus('','Kliknij ponownie w ciągu 5 sekund, aby wysłać komunikat na serwer.');
+    setTimeout(function(){if(!sending&&armSend){armSend=0;b.textContent='Wyślij komunikat';setStatus('','')}},5100);return;
+  }
+  armSend=0;sendNow();
+});
+
+/* ---- init ---- */
+$('#gps').innerHTML=GPS.map(function(g){return '<option value="'+esc(g)+'">'}).join('');
+renderTpls();
+if(!hadDraft&&!hist.length){S.num=nextNum(Number(S.season)||2026);applyTpl(TPL[0])}
+setTheme(dcTheme);renderHist();sync();
+var sv=lsGet(KEY_W,null);
+if(sv&&typeof sv.url==='string'){$('#whUrl').value=sv.url;$('#whRemember').checked=true;checkUrl()}
+if(inViewer){$('#btnSend').disabled=true;$('#sendNote').textContent='Wysyłka działa w pliku HTML otwartym w przeglądarce. W podglądzie na claude.ai połączenia z Discordem są blokowane. '+$('#sendNote').textContent}
+if(window.claude&&window.claude.use){
+  window.claude.use('downloads').then(function(d){if(d){dl=d;$('#btnSaveJson').hidden=false;$('#btnBackup').hidden=false}},function(){});
+}else{
+  dl={save:function(o){return new Promise(function(res){
+    var b=o.data instanceof Blob?o.data:new Blob([o.data],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=o.filename;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);res({status:'saved'});
+  })}};
+  $('#btnSaveJson').hidden=false;$('#btnBackup').hidden=false;
+}
+})();
+</script>
+
+</body>
+</html>
